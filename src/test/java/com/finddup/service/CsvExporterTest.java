@@ -24,8 +24,10 @@ class CsvExporterTest {
 
     @Test
     void escribeUnaFilaPorArchivoConBomYSeparadorPuntoYComa() throws IOException {
+        // Solo caracteres válidos en Windows (no admite " en nombres); el escape de comillas
+        // se prueba en escapaSoloCuandoEsNecesario.
         Path a = Files.writeString(dir.resolve("a;1.txt"), "hola");
-        Path b = Files.writeString(dir.resolve("b \"copia\".txt"), "hola");
+        Path b = Files.writeString(dir.resolve("b copia.txt"), "hola");
         ScanResult result = ScanResult.builder()
                 .root(dir)
                 .groups(List.of(DuplicateGroup.builder().hash("abc").size(4).file(a).file(b).build()))
@@ -41,7 +43,7 @@ class CsvExporterTest {
         assertEquals(3, lines.size());
         assertEquals(String.join(";", CsvExporter.HEADERS), lines.get(0));
         assertTrue(lines.get(1).startsWith("1;abc;4;2;\"a;1.txt\";"), lines.get(1));
-        assertTrue(lines.get(2).startsWith("1;abc;4;2;\"b \"\"copia\"\".txt\";"), lines.get(2));
+        assertTrue(lines.get(2).startsWith("1;abc;4;2;b copia.txt;"), lines.get(2));
         assertTrue(content.contains("\r\n"), "Fin de línea Windows");
     }
 
