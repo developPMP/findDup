@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+
+    <Properties>
+        <Property name="LOG_PATTERN">%d{ISO8601} [%t] %-5level %logger{36} - %msg%n</Property>
+        <!-- En Windows: C:\Users\<usuario>\.findDup\logs -->
+        <Property name="LOG_DIR">${sys:user.home}/.findDup/logs</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <RollingFile name="RollingFile"
+                     fileName="${LOG_DIR}/findDup.log"
+                     filePattern="${LOG_DIR}/findDup-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+
+        <Async name="AsyncFile" includeLocation="false">
+            <AppenderRef ref="RollingFile"/>
+        </Async>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="com.finddup" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFile"/>
+        </Logger>
+
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFile"/>
+        </Root>
+    </Loggers>
+
+</Configuration>
